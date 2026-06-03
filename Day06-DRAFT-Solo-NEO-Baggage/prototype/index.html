@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NEO Baggage Eligibility Checker</title>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #607083;
+      --line: #d8e1e8;
+      --panel: #f7fafc;
+      --blue: #0b6f8f;
+      --blue-dark: #07536d;
+      --green: #0f7b58;
+      --amber: #a65f00;
+      --red: #b3261e;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background: #eef4f7;
+      line-height: 1.45;
+    }
+
+    header {
+      background: var(--blue-dark);
+      color: var(--white);
+      padding: 16px 24px;
+      border-bottom: 4px solid #e0b13f;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    header p {
+      margin: 4px 0 0;
+      max-width: 900px;
+      color: #dcebf1;
+      font-size: 14px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) 1fr;
+      gap: 16px;
+      padding: 16px;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    section {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .section-title {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    form {
+      padding: 16px;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    select,
+    input {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid #b8c7d3;
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--ink);
+      background: var(--white);
+      font-size: 14px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .grid-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    button {
+      min-height: 38px;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--blue);
+      color: var(--white);
+    }
+
+    .secondary {
+      background: #e8f0f4;
+      color: var(--blue-dark);
+    }
+
+    .output {
+      padding: 16px;
+    }
+
+    .status {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-left-width: 6px;
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .status.good {
+      border-left-color: var(--green);
+    }
+
+    .status.warn {
+      border-left-color: var(--amber);
+    }
+
+    .status.bad {
+      border-left-color: var(--red);
+    }
+
+    .status h2 {
+      margin: 0 0 4px;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .status p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      color: var(--white);
+      font-weight: 700;
+      flex: 0 0 auto;
+    }
+
+    .good .pill {
+      background: var(--green);
+    }
+
+    .warn .pill {
+      background: var(--amber);
+    }
+
+    .bad .pill {
+      background: var(--red);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--white);
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+
+    ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+    }
+
+    li {
+      margin: 5px 0;
+    }
+
+    a {
+      color: var(--blue);
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .log {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #f0f5f2;
+      border: 1px solid #cbded4;
+      font-size: 13px;
+      color: #2e5541;
+    }
+
+    .empty {
+      color: var(--muted);
+    }
+
+    @media (max-width: 860px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 14px 16px;
+      }
+
+      main {
+        padding: 10px;
+      }
+
+      .grid-two {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>NEO Baggage Eligibility Checker</h1>
+    <p>Prototype for one narrow AI product slice: help a passenger verify prepaid baggage eligibility, source, and fallback before deciding.</p>
+  </header>
+
+  <main>
+    <section>
+      <div class="section-title">Passenger inputs</div>
+      <form id="checker-form">
+        <div class="field">
+          <label for="allowance">Free checked baggage entitlement</label>
+          <select id="allowance">
+            <option value="">Unknown</option>
+            <option value="notEnough" selected>Checked in Manage Booking: current allowance is not enough</option>
+            <option value="enough">Checked in Manage Booking: current allowance is enough</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="timeLeft">Time before departure</label>
+          <select id="timeLeft">
+            <option value="">Unknown</option>
+            <option value="gt3" selected>More than 3 hours</option>
+            <option value="lt3">Less than 3 hours</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="ticketType">Ticket / document</label>
+          <select id="ticketType">
+            <option value="">Unknown</option>
+            <option value="738" selected>Vietnam Airlines ticket number starts with 738</option>
+            <option value="other">Not sure / other ticket stock</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="operator">Operating airline</label>
+          <select id="operator">
+            <option value="">Unknown</option>
+            <option value="vna" selected>Vietnam Airlines or Pacific Airlines</option>
+            <option value="other">Other operating airline</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="atr">Aircraft exception</label>
+          <select id="atr">
+            <option value="">Unknown</option>
+            <option value="no" selected>Not operated by ATR 72</option>
+            <option value="yes">Operated by ATR 72</option>
+          </select>
+        </div>
+
+        <div class="grid-two">
+          <div class="field">
+            <label for="weight">Bag weight (kg)</label>
+            <input id="weight" type="number" min="0" step="0.1" value="20">
+          </div>
+          <div class="field">
+            <label for="size">Total size (cm)</label>
+            <input id="size" type="number" min="0" step="1" value="150">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="channel">Purchase channel</label>
+          <select id="channel">
+            <option value="">Unknown</option>
+            <option value="vna" selected>Vietnam Airlines website/app</option>
+            <option value="agency">Travel agency</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button class="primary" type="submit">Check eligibility</button>
+          <button class="secondary" type="button" id="scenarioFailure">Load failure case</button>
+        </div>
+      </form>
+    </section>
+
+    <section>
+      <div class="section-title">AI-assisted decision</div>
+      <div class="output" id="output"></div>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("checker-form");
+    const output = document.getElementById("output");
+    const scenarioFailure = document.getElementById("scenarioFailure");
+    let previousSnapshot = null;
+    let correctionCount = 0;
+
+    function value(id) {
+      return document.getElementById(id).value;
+    }
+
+    function numberValue(id) {
+      const raw = document.getElementById(id).value;
+      return raw === "" ? null : Number(raw);
+    }
+
+    function snapshot() {
+      return {
+        timeLeft: value("timeLeft"),
+        allowance: value("allowance"),
+        ticketType: value("ticketType"),
+        operator: value("operator"),
+        atr: value("atr"),
+        weight: numberValue("weight"),
+        size: numberValue("size"),
+        channel: value("channel")
+      };
+    }
+
+    function diffFields(prev, next) {
+      if (!prev) return [];
+      return Object.keys(next).filter((key) => prev[key] !== next[key]);
+    }
+
+    function analyze(data) {
+      const missing = [];
+      const blockers = [];
+      const warnings = [];
+
+      if (!data.timeLeft) missing.push("time before departure");
+      if (!data.allowance) missing.push("free checked baggage allowance in Manage Booking");
+      if (!data.ticketType) missing.push("ticket number starts with 738 or not");
+      if (!data.operator) missing.push("operating airline");
+      if (!data.atr) missing.push("ATR 72 exception");
+      if (data.weight === null) missing.push("bag weight");
+      if (data.size === null) missing.push("total bag size");
+
+      if (data.timeLeft === "lt3") blockers.push("Prepaid baggage must be purchased at least 3 hours before departure.");
+      if (data.allowance === "enough") blockers.push("Your current free checked baggage appears enough, so do not buy an add-on before rechecking the booking.");
+      if (data.ticketType === "other") blockers.push("Prepaid baggage applies to Vietnam Airlines ticket stock 738.");
+      if (data.operator === "other") blockers.push("This slice only supports flights operated by Vietnam Airlines or Pacific Airlines.");
+      if (data.atr === "yes") blockers.push("Prepaid baggage is not applied to ATR 72 operated sectors.");
+      if (data.weight !== null && data.weight > 23) blockers.push("The bag is over the 23kg standard prepaid baggage limit.");
+      if (data.size !== null && data.size > 158) blockers.push("The bag is over the 158cm total-size standard prepaid baggage limit.");
+
+      if (data.channel === "agency") warnings.push("Ticket was bought via an agency. Verify PNR/e-ticket in Manage Booking before relying on online purchase.");
+
+      if (missing.length) {
+        return { type: "warn", title: "Need more information before deciding", missing, blockers, warnings };
+      }
+      if (blockers.length) {
+        return { type: "bad", title: "Do not rely on prepaid baggage online for this case", missing, blockers, warnings };
+      }
+      return { type: "good", title: "Likely eligible for prepaid baggage online", missing, blockers, warnings };
+    }
+
+    function render(result, changed) {
+      const icon = result.type === "good" ? "OK" : result.type === "warn" ? "?" : "!";
+      const summary = result.type === "good"
+        ? "Proceed to Manage Booking, then buy add-on service only if the current free allowance is not enough."
+        : result.type === "warn"
+          ? "The system should ask again instead of giving a confident answer."
+          : "Use the safer fallback and verify with official Vietnam Airlines channels.";
+
+      const askAgain = result.missing.length
+        ? `<div class="card"><h3>Ask again</h3><ul>${result.missing.map(item => `<li>Confirm ${item}.</li>`).join("")}</ul></div>`
+        : "";
+
+      const blockers = result.blockers.length
+        ? `<div class="card"><h3>Rules triggered</h3><ul>${result.blockers.map(item => `<li>${item}</li>`).join("")}</ul></div>`
+        : `<div class="card"><h3>Rules checked</h3><ul><li>Current free allowance is not enough.</li><li>More than 3 hours before departure.</li><li>Ticket stock 738.</li><li>Operated by Vietnam Airlines/Pacific Airlines.</li><li>Not ATR 72.</li><li>Bag within 23kg and 158cm.</li></ul></div>`;
+
+      const warnings = result.warnings.length
+        ? `<div class="card"><h3>Human check</h3><ul>${result.warnings.map(item => `<li>${item}</li>`).join("")}</ul></div>`
+        : "";
+
+      const fallback = `<div class="card"><h3>Fallback</h3><ul><li>Check free baggage allowance in Manage Booking before paying for an add-on.</li><li>If less than 3 hours remain, go to the airport check-in counter and buy excess baggage there.</li><li>If bag exceeds 23kg or 158cm, repack or prepare for excess baggage charges.</li><li>Do not enter sensitive personal data into a public chat.</li></ul></div>`;
+
+      const sources = `<div class="card"><h3>Source card</h3><ul><li><a href="https://www.vietnamairlines.com/vn/vi/travel-information/baggage/excess-baggage" target="_blank" rel="noreferrer">Vietnam Airlines prepaid baggage policy</a></li><li><a href="https://www.vietnamairlines.com/vn/vi/support/condition-of-chatbot-NEO" target="_blank" rel="noreferrer">NEO chatbot terms</a></li></ul></div>`;
+
+      const correction = changed.length
+        ? `<div class="log">Correction log ${correctionCount}: user changed ${changed.join(", ")}. Recomputed eligibility instead of repeating the old answer.</div>`
+        : `<div class="log empty">Correction log: no user correction yet.</div>`;
+
+      output.innerHTML = `
+        <div class="status ${result.type}">
+          <div class="pill">${icon}</div>
+          <div>
+            <h2>${result.title}</h2>
+            <p>${summary}</p>
+          </div>
+        </div>
+        <div class="cards">
+          ${askAgain}
+          ${blockers}
+          ${warnings}
+          ${fallback}
+          ${sources}
+        </div>
+        ${correction}
+      `;
+    }
+
+    function runCheck(event) {
+      if (event) event.preventDefault();
+      const data = snapshot();
+      const changed = diffFields(previousSnapshot, data);
+      if (changed.length) correctionCount += 1;
+      render(analyze(data), changed);
+      previousSnapshot = data;
+    }
+
+    scenarioFailure.addEventListener("click", () => {
+      document.getElementById("timeLeft").value = "lt3";
+      document.getElementById("allowance").value = "notEnough";
+      document.getElementById("ticketType").value = "738";
+      document.getElementById("operator").value = "vna";
+      document.getElementById("atr").value = "no";
+      document.getElementById("weight").value = "25";
+      document.getElementById("size").value = "160";
+      document.getElementById("channel").value = "agency";
+      runCheck();
+    });
+
+    form.addEventListener("submit", runCheck);
+    runCheck();
+  </script>
+</body>
+</html>
